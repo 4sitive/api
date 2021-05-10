@@ -5,4 +5,7 @@ spring:
   jackson:
     serialization:
       fail-on-empty-beans: false
-      indent-output: true
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: debug
+    org.springframework.data.mongodb.repository.query: debug
