@@ -1,0 +1,8 @@
+spring:
+  profiles:
+    group:
+      default: test
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+      indent-output: true
