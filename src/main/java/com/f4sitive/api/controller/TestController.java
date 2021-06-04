@@ -1,18 +1,22 @@
-package com.foursitive.api.controller;
+package com.f4sitive.api.controller;
 
-import com.foursitive.api.entity.Tag;
-import com.foursitive.api.entity.Test;
-import com.foursitive.api.repository.TagRepository;
-import com.foursitive.api.repository.TestRepository;
+import com.f4sitive.api.entity.Tag;
+import com.f4sitive.api.entity.Test;
+import com.f4sitive.api.repository.TagRepository;
+import com.f4sitive.api.repository.TestRepository;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Mono;
 
+import java.security.Principal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -31,8 +35,13 @@ public class TestController {
     }
 
     @GetMapping
-    public Page<TestResponse> get(@RequestHeader("User-Id") String userId, Pageable pageable) {
-        return testRepository.findAll(pageable).map(this::mapper);
+    public Mono<Page<TestResponse>> get(Mono<Principal> principal, @RequestHeader("User-Id") String userId, Pageable pageable) {
+//        ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication);
+        return principal.map(o -> {
+            System.out.print(o.getName());
+            testRepository.test(pageable);
+            return testRepository.findAll(pageable).map(this::mapper);
+        });
     }
 
     @PostMapping

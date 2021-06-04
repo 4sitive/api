@@ -20,5 +20,8 @@ jobs:
     runs-on: [ self-hosted ]
     steps:
       - name: Deploy with Docker
+        env:
+          MONGODB_URI: ${{secrets.MONGODB_URI}}
+          KEY: ${{secrets.KEY}}
         run: |
           docker-compose up --no-deps --build --force-recreate --detach

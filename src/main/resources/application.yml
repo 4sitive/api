@@ -5,7 +5,17 @@ spring:
   jackson:
     serialization:
       fail-on-empty-beans: false
+  config:
+    import: optional:classpath:security.yml
+  application:
+    name: api
 logging:
   level:
     org.springframework.data.mongodb.core.MongoTemplate: debug
     org.springframework.data.mongodb.repository.query: debug
+server:
+  forward-headers-strategy: framework
+  port: 8080
+management:
+  server:
+    port: 8081

@@ -1,4 +1,4 @@
-package com.foursitive.api;
+package com.f4sitive.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

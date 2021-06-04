@@ -1,23 +1,20 @@
-package com.foursitive.api.entity;
+package com.f4sitive.api.entity;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
 
-@Document(collection = "test")
+@Document(collection = "feed")
 @Getter
 @Setter
-public class Test {
+public class Feed {
     @Id
     private String id;
     private String subject;
     private String body;
-    private Collection<Tag> tags = new LinkedHashSet<>();
-
 }

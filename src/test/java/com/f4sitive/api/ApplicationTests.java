@@ -1,9 +1,9 @@
-package com.foursitive.api;
+package com.f4sitive.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+//@SpringBootTest
 class ApplicationTests {
 
     @Test

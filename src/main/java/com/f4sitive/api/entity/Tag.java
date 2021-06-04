@@ -1,4 +1,4 @@
-package com.foursitive.api.entity;
+package com.f4sitive.api.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

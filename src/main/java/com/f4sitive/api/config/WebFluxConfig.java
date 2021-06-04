@@ -1,4 +1,4 @@
-package com.foursitive.api.config;
+package com.f4sitive.api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
