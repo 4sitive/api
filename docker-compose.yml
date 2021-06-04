@@ -1,0 +1,26 @@
+version: '3.7'
+services:
+  api:
+    image: ghcr.io/4sitive/api:latest
+    restart: always
+    container_name: api
+    hostname: api
+    network_mode: bridge
+    environment:
+      JAVA_OPTS: >-
+        -Dfile.encoding=UTF-8
+        -Dcrypto.policy=unlimited
+        -Dsun.net.inetaddr.ttl=0
+        -Dsun.net.inetaddr.negative.ttl=0
+        -Djava.net.preferIPv4Stack=true
+        -Djava.security.egd=file:/dev/./urandom
+        -Duser.country=KR
+        -Duser.language=ko
+        -Duser.timezone=Asia/Seoul
+      SPRING_PROFILES_ACTIVE: LOGING_FILE,LOGGING_CONSOLE_JSON
+      LOG_PATH: /workspace/log
+      SERVER_PORT: 28080
+      MANAGEMENT_SERVER_PORT: 28081
+    ports:
+      - "28080:28080"
+      - "28081:28081"
