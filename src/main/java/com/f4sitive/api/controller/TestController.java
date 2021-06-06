@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -17,10 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.security.Principal;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -35,13 +33,16 @@ public class TestController {
     }
 
     @GetMapping
-    public Mono<Page<TestResponse>> get(Mono<Principal> principal, @RequestHeader("User-Id") String userId, Pageable pageable) {
+    public Slice<TestResponse> get(Principal principal, @RequestParam(required = false) Map<String, Object> param, Pageable pageable) {
 //        ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication);
-        return principal.map(o -> {
-            System.out.print(o.getName());
-            testRepository.test(pageable);
-            return testRepository.findAll(pageable).map(this::mapper);
-        });
+//        return principal.map(o -> {
+//            System.out.print(o.getName());
+//            testRepository.test(pageable);
+//            return testRepository.findAll(pageable).map(this::mapper);
+//        });
+        System.out.print(principal);
+        System.out.print(param);
+        return testRepository.test(pageable, param).map(this::mapper);
     }
 
     @PostMapping

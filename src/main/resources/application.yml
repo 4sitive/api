@@ -9,9 +9,14 @@ spring:
     import: optional:classpath:security.yml
   application:
     name: api
+  data:
+    mongodb:
+      auto-index-creation: true
+      database: daymotion
 logging:
   level:
     org.springframework.data.mongodb.core.MongoTemplate: debug
+    org.springframework.data.mongodb.core.ReactiveMongoTemplate: debug
     org.springframework.data.mongodb.repository.query: debug
 server:
   forward-headers-strategy: framework
