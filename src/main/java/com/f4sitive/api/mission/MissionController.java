@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -23,18 +25,18 @@ public class MissionController {
     }
 
     @GetMapping("/daymotion/missions")
-    public void get(@PageableDefault Pageable pageable){
-
+    public Flux<Mission> get(@PageableDefault Pageable pageable){
+        return missionRepository.findAll();
     }
 
     @PostMapping("/daymotion/missions")
-    public MissionResponse post(@RequestBody Mission request) {
-        Mission mission = missionRepository.save(request);
-        return MissionResponse.builder()
+    public Mono<MissionResponse> post(@RequestBody Mission request) {
+        return missionRepository.save(request)
+                .map(mission -> MissionResponse.builder()
 //                .body(mission.getBody())
-                .id(mission.getId())
+                        .id(mission.getId())
 //                .subject(mission.getSubject())
-                .build();
+                        .build());
     }
 
     @GetMapping("/daymotion/today/missions")

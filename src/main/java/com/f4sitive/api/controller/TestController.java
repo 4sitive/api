@@ -46,31 +46,33 @@ public class TestController {
     }
 
     @PostMapping
-    public TestResponse post(@RequestHeader("User-Id") String userId, @RequestBody TestRequest request) {
+    public Mono<TestResponse> post(@RequestHeader("User-Id") String userId, @RequestBody TestRequest request) {
         Test test = new Test();
         test.setSubject(request.getSubject());
         test.setBody(request.getBody());
         test.setTags(tags(request.getTags()));
-        return mapper(testRepository.save(test));
+        return testRepository.save(test)
+                .map(this::mapper);
+//        return mapper(testRepository.save(test));
     }
 
     @PutMapping("/{id}")
-    public TestResponse put(@RequestHeader("User-Id") String userId, @PathVariable String id, @RequestBody TestRequest request) {
+    public Mono<TestResponse> put(@RequestHeader("User-Id") String userId, @PathVariable String id, @RequestBody TestRequest request) {
         return testRepository.findById(id)
-                .map(test -> {
+                .flatMap(test -> {
                     test.setBody(request.getBody());
                     test.setSubject(request.getSubject());
                     test.setTags(tags(request.getTags()));
                     return testRepository.save(test);
                 })
-                .map(this::mapper)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NO_CONTENT));
+                .map(this::mapper);
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NO_CONTENT));
     }
 
     List<Tag> tags(Collection<String> names) {
         List<Tag> tags = tagRepository.findAllByNameIn(names);
-        tagRepository.saveAll(names.stream().filter(name -> tags.stream().noneMatch(t -> name.equals(t.getName()))).map(Tag::new).collect(Collectors.toList()))
-                .forEach(tag -> Collections.addAll(tags, tag));
+//        tagRepository.saveAll(names.stream().filter(name -> tags.stream().noneMatch(t -> name.equals(t.getName()))).map(Tag::new).collect(Collectors.toList()))
+//                .forEach(tag -> Collections.addAll(tags, tag));
         return tags;
     }
 

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -14,20 +15,17 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.mongodb.repository.support.MappingMongoEntityInformation;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class TestRepositoryImpl implements TestRepositoryCustom {
-    private final MongoOperations mongoOperations;
+    private final ReactiveMongoOperations mongoOperations;
     private final MongoPersistentEntity entity;
     private final MongoEntityInformation<Test, String> entityInformation;
 
-    public TestRepositoryImpl(MongoOperations mongoOperations) {
+    public TestRepositoryImpl(ReactiveMongoOperations mongoOperations) {
         this.mongoOperations = mongoOperations;
         this.entity = mongoOperations.getConverter().getMappingContext().getRequiredPersistentEntity(Test.class);
         this.entityInformation = new MappingMongoEntityInformation<>(entity, String.class);
@@ -77,7 +75,8 @@ public class TestRepositoryImpl implements TestRepositoryCustom {
                     query.addCriteria(new Criteria().orOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
                 });
         query.limit(pageable.getPageSize() + 1);
-        List<Test> entities = this.mongoOperations.find(query, this.entityInformation.getJavaType(), this.entityInformation.getCollectionName());
+        List<Test> entities = Collections.EMPTY_LIST;
+//                this.mongoOperations.find(query, this.entityInformation.getJavaType(), this.entityInformation.getCollectionName());
         boolean hasNext = entities.size() > pageable.getPageSize();
         List<Test> content = new ArrayList<>(entities);
         List<String> nextParam = new ArrayList<>();
