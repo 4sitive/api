@@ -5,8 +5,12 @@ import com.f4sitive.api.admin.model.PutMissionRequest;
 import com.f4sitive.api.entity.Category;
 import com.f4sitive.api.entity.Mission;
 import com.f4sitive.api.service.MissionService;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @RestController
 public class AdminController {
@@ -16,14 +20,17 @@ public class AdminController {
         this.missionService = missionService;
     }
 
+    @Operation(summary = "미션 등록")
     @PostMapping("/admin/mission")
     public Mono<Mission> postMission(@RequestBody PostMissionRequest request) {
         Mission mission = new Mission();
         mission.setContent(request.getContent());
         mission.setImage(request.getImage());
         mission.setQuestion(request.getQuestion());
-        mission.setCategory(new Category(request.getCategoryId()));
-        return missionService.save(mission);
+        mission.setCategoryName(request.getCategoryName());
+        return missionService
+                .save(mission)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     @PutMapping("/admin/mission/{id}")
@@ -31,7 +38,7 @@ public class AdminController {
 
     }
 
-    @DeleteMapping("/admin/mission")
+    @DeleteMapping("/admin/mission/{id}")
     public Mono<Void> deleteMission(@PathVariable String id) {
         return missionService.deleteById(id);
     }

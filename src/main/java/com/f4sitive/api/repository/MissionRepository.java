@@ -9,11 +9,11 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 
-public interface MissionRepository extends ReactiveMongoRepository<Mission, String> {
+public interface MissionRepository extends MongoRepository<Mission, String> {
     @Aggregation(value = "{$sample: {size: ?0} }", collation = "mission")
     List<Mission> sample(int size);
 
-    default Flux<Mission> custom(){
-        return findAll(Example.of(new Mission(null, "", null, null, null)));
-    }
+//    default Flux<Mission> custom(){
+//        return findAll(Example.of(new Mission(null, "", null, null, null)));
+//    }
 }

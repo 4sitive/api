@@ -46,26 +46,27 @@ public class TestController {
     }
 
     @PostMapping
-    public Mono<TestResponse> post(@RequestHeader("User-Id") String userId, @RequestBody TestRequest request) {
+    public void post(@RequestHeader("User-Id") String userId, @RequestBody TestRequest request) {
         Test test = new Test();
         test.setSubject(request.getSubject());
         test.setBody(request.getBody());
         test.setTags(tags(request.getTags()));
-        return testRepository.save(test)
-                .map(this::mapper);
+//        return testRepository.save(test)
+//                .map(this::mapper);
 //        return mapper(testRepository.save(test));
     }
 
     @PutMapping("/{id}")
-    public Mono<TestResponse> put(@RequestHeader("User-Id") String userId, @PathVariable String id, @RequestBody TestRequest request) {
-        return testRepository.findById(id)
-                .flatMap(test -> {
-                    test.setBody(request.getBody());
-                    test.setSubject(request.getSubject());
-                    test.setTags(tags(request.getTags()));
-                    return testRepository.save(test);
-                })
-                .map(this::mapper);
+    public void put(@RequestHeader("User-Id") String userId, @PathVariable String id, @RequestBody TestRequest request) {
+        return;
+//        return testRepository.findById(id)
+//                .flatMap(test -> {
+//                    test.setBody(request.getBody());
+//                    test.setSubject(request.getSubject());
+//                    test.setTags(tags(request.getTags()));
+//                    return testRepository.save(test);
+//                })
+//                .map(this::mapper);
 //                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NO_CONTENT));
     }
 

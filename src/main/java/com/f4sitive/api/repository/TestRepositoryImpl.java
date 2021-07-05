@@ -21,11 +21,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class TestRepositoryImpl implements TestRepositoryCustom {
-    private final ReactiveMongoOperations mongoOperations;
+    private final MongoOperations mongoOperations;
     private final MongoPersistentEntity entity;
     private final MongoEntityInformation<Test, String> entityInformation;
 
-    public TestRepositoryImpl(ReactiveMongoOperations mongoOperations) {
+    public TestRepositoryImpl(MongoOperations mongoOperations) {
         this.mongoOperations = mongoOperations;
         this.entity = mongoOperations.getConverter().getMappingContext().getRequiredPersistentEntity(Test.class);
         this.entityInformation = new MappingMongoEntityInformation<>(entity, String.class);
@@ -75,8 +75,7 @@ public class TestRepositoryImpl implements TestRepositoryCustom {
                     query.addCriteria(new Criteria().orOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
                 });
         query.limit(pageable.getPageSize() + 1);
-        List<Test> entities = Collections.EMPTY_LIST;
-//                this.mongoOperations.find(query, this.entityInformation.getJavaType(), this.entityInformation.getCollectionName());
+        List<Test> entities = this.mongoOperations.find(query, this.entityInformation.getJavaType(), this.entityInformation.getCollectionName());
         boolean hasNext = entities.size() > pageable.getPageSize();
         List<Test> content = new ArrayList<>(entities);
         List<String> nextParam = new ArrayList<>();

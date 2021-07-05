@@ -10,6 +10,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -25,18 +26,9 @@ public class MissionController {
     }
 
     @GetMapping("/daymotion/missions")
-    public Flux<Mission> get(@PageableDefault Pageable pageable){
-        return missionRepository.findAll();
-    }
-
-    @PostMapping("/daymotion/missions")
-    public Mono<MissionResponse> post(@RequestBody Mission request) {
-        return missionRepository.save(request)
-                .map(mission -> MissionResponse.builder()
-//                .body(mission.getBody())
-                        .id(mission.getId())
-//                .subject(mission.getSubject())
-                        .build());
+    public Mono<List<Mission>> get(@PageableDefault Pageable pageable){
+        return missionService.findAll(pageable)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     @GetMapping("/daymotion/today/missions")
