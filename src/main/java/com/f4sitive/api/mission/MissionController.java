@@ -1,44 +1,33 @@
 package com.f4sitive.api.mission;
 
-import com.f4sitive.api.entity.Mission;
-import com.f4sitive.api.repository.MissionRepository;
+import com.f4sitive.api.mission.model.GetMissionResponse;
+import com.f4sitive.api.mission.model.GetTodayMissionResponse;
 import com.f4sitive.api.service.MissionService;
-import org.springframework.data.domain.Page;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-
-import java.util.List;
 
 @RestController
 public class MissionController {
-    private final MissionRepository missionRepository;
     private final MissionService missionService;
 
-    public MissionController(MissionRepository missionRepository,
-                             MissionService missionService) {
-        this.missionRepository = missionRepository;
+    public MissionController(MissionService missionService) {
         this.missionService = missionService;
     }
 
+    @Operation(description = "미션 조회")
     @GetMapping("/daymotion/missions")
-    public Mono<List<Mission>> get(@PageableDefault Pageable pageable){
-        return missionService.findAll(pageable)
-                .subscribeOn(Schedulers.boundedElastic());
+    public Mono<GetMissionResponse> getMission(@PageableDefault Pageable pageable){
+//        return missionService.findAll(pageable)
+//                .subscribeOn(Schedulers.boundedElastic());
+        return Mono.just(GetMissionResponse.builder().build());
     }
 
+    @Operation(description = "투데이 미션 조회")
     @GetMapping("/daymotion/today/missions")
-    public Page<MissionResponse> getToday(Pageable pageable) {
-        List<Mission> missions = missionRepository.sample(pageable.getPageSize());
-        return PageableExecutionUtils.getPage(missions, pageable, missions::size)
-                .map(mission -> MissionResponse.builder()
-//                        .body(mission.getBody())
-                        .id(mission.getId())
-//                        .subject(mission.getSubject())
-                        .build());
+    public Mono<GetTodayMissionResponse> getTodayMission() {
+        return Mono.just(GetTodayMissionResponse.builder().build());
     }
 }

@@ -1,13 +1,12 @@
-package com.f4sitive.api.repository;
+package com.f4sitive.api.service;
 
-import com.f4sitive.api.entity.CursorImpl;
-import com.f4sitive.api.entity.Test;
+import com.f4sitive.api.entity.Feed;
+import com.f4sitive.api.feed.model.GetFeedResponse;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -15,24 +14,25 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.mongodb.repository.support.MappingMongoEntityInformation;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-public class TestRepositoryImpl implements TestRepositoryCustom {
+public class FeedService {
     private final MongoOperations mongoOperations;
     private final MongoPersistentEntity entity;
-    private final MongoEntityInformation<Test, String> entityInformation;
+    private final MongoEntityInformation<Feed, String> entityInformation;
 
-    public TestRepositoryImpl(MongoOperations mongoOperations) {
+    public FeedService(MongoOperations mongoOperations) {
         this.mongoOperations = mongoOperations;
-        this.entity = mongoOperations.getConverter().getMappingContext().getRequiredPersistentEntity(Test.class);
-        this.entityInformation = new MappingMongoEntityInformation<>(entity, String.class);
+        this.entity = mongoOperations.getConverter().getMappingContext().getRequiredPersistentEntity(Feed.class);
+        this.entityInformation = new MappingMongoEntityInformation<>(this.entity, String.class);
     }
 
-    @Override
-    public Slice<Test> test(Pageable pageable, Map<String, Object> param) {
+    public Slice<Feed> test(Pageable pageable, Map<String, Object> param) {
 //        .maxTime()
 //        .addCriteria()
         Sort sort = pageable.getSortOr(Sort.by(Sort.Direction.ASC, "_id"));
@@ -53,21 +53,19 @@ public class TestRepositoryImpl implements TestRepositoryCustom {
                     AtomicReference<Criteria> reference = new AtomicReference<>(criteria);
                     List<Criteria> criteriaList = sort.stream()
                             .filter(order -> !order.getProperty().equals("_id"))
-                            .map(order -> {
-                                return Optional.ofNullable(param.get(order.getProperty()))
-                                        .map(value -> {
-                                            switch (order.getDirection()) {
-                                                case ASC:
-                                                    reference.set(reference.get().and(order.getProperty()).is(value));
-                                                    return Criteria.where(order.getProperty()).gt(value);
-                                                case DESC:
-                                                    reference.set(reference.get().and(order.getProperty()).is(value));
-                                                    return Criteria.where(order.getProperty()).lt(value);
-                                                default:
-                                                    return null;
-                                            }
-                                        });
-                            })
+                            .map(order -> Optional.ofNullable(param.get(order.getProperty()))
+                                    .map(value -> {
+                                        switch (order.getDirection()) {
+                                            case ASC:
+                                                reference.set(reference.get().and(order.getProperty()).is(value));
+                                                return Criteria.where(order.getProperty()).gt(value);
+                                            case DESC:
+                                                reference.set(reference.get().and(order.getProperty()).is(value));
+                                                return Criteria.where(order.getProperty()).lt(value);
+                                            default:
+                                                return null;
+                                        }
+                                    }))
                             .filter(optional -> optional.isPresent())
                             .map(optional -> optional.get())
                             .collect(Collectors.toList());
@@ -75,13 +73,13 @@ public class TestRepositoryImpl implements TestRepositoryCustom {
                     query.addCriteria(new Criteria().orOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
                 });
         query.limit(pageable.getPageSize() + 1);
-        List<Test> entities = this.mongoOperations.find(query, this.entityInformation.getJavaType(), this.entityInformation.getCollectionName());
+        List<Feed> entities = this.mongoOperations.find(query, this.entityInformation.getJavaType(), this.entityInformation.getCollectionName());
         boolean hasNext = entities.size() > pageable.getPageSize();
-        List<Test> content = new ArrayList<>(entities);
+        List<Feed> content = new ArrayList<>(entities);
         List<String> nextParam = new ArrayList<>();
         if (hasNext) {
             content = entities.subList(0, pageable.getPageSize());
-            Test last = content.get(content.size() - 1);
+            Feed last = content.get(content.size() - 1);
             try {
                 nextParam.add("_id=" + entity.getIdProperty().getRequiredGetter().invoke(last));
             } catch (IllegalAccessException e) {
@@ -101,6 +99,6 @@ public class TestRepositoryImpl implements TestRepositoryCustom {
                         }
                     });
         }
-        return new CursorImpl<Test>(content, pageable, hasNext, String.join("&", nextParam)); //continuationToken
+        return new GetFeedResponse<>(content, pageable, hasNext, String.join("&", nextParam));
     }
 }
