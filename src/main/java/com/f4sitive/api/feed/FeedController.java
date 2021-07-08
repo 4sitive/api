@@ -12,7 +12,8 @@ public class FeedController {
     @GetMapping("/daymotion/feeds")
     public Mono<GetFeedResponse<FeedResponse>> getFeed(Pageable pageable,
                                                        @RequestParam(required = false) String pageToken,
-                                                       @RequestParam(required = false) String categoryName) {
+                                                       @RequestParam(required = false) String categoryId,
+                                                       @RequestParam(required = false) String userId) {
         return Mono.just(new GetFeedResponse(Collections.emptyList(), pageable, false, pageToken));
     }
 

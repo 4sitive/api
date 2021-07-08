@@ -5,9 +5,8 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class PostFeedResponse {
+public class UserResponse {
     private String id;
     private String image;
-    private String categoryName;
-    private String missionQuestion;
+    private String name;
 }

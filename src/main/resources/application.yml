@@ -13,8 +13,20 @@ spring:
     mongodb:
       auto-index-creation: true
       database: daymotion
+  r2dbc:
+    url: r2dbc:mysql://4sitive.mysql.database.azure.com:3306/daymotion?useSSL=true&requireSSL=false&useUnicode=true&tcpKeepAlive=true&tcpNoDelay=true&connectTimeout=PT2S&tlsVersion=TLSv1.2&serverZoneId=Asia/Seoul&characterEncoding=utf8
+    username: sitive4@4sitive
+    pool:
+      initial-size: 1
+      max-size: 1
+      max-create-connection-time: PT2S
+      max-acquire-time: PT2S
+      max-idle-time: PT180S
+      validation-query: SELECT 1
+      validation-depth: REMOTE
 logging:
   level:
+    SQL: trace
     org.springframework.data.mongodb.core.MongoTemplate: debug
     org.springframework.data.mongodb.core.ReactiveMongoTemplate: debug
     org.springframework.data.mongodb.repository.query: debug

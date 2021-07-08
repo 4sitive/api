@@ -5,8 +5,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.*;
 
 
 @Document(collection = "feed")
@@ -17,4 +16,5 @@ public class Feed {
     private String id;
     private String subject;
     private String body;
+    private Map<String, Set<String>> emoji = new HashMap<>();
 }

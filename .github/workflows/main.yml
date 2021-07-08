@@ -23,5 +23,6 @@ jobs:
         env:
           MONGODB_URI: ${{secrets.MONGODB_URI}}
           KEY: ${{secrets.KEY}}
+          R2DBC_PASSWORD: ${{secrets.R2DBC_PASSWORD}}
         run: |
           docker-compose up --no-deps --build --force-recreate --detach
