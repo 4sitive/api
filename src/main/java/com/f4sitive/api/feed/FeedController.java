@@ -10,32 +10,32 @@ import java.util.Collections;
 @RestController
 public class FeedController {
     @GetMapping("/daymotion/feeds")
-    public Mono<GetFeedResponse<FeedResponse>> getFeed(Pageable pageable,
-                                                       @RequestParam(required = false) String pageToken,
-                                                       @RequestParam(required = false) String categoryId,
-                                                       @RequestParam(required = false) String userId) {
-        return Mono.just(new GetFeedResponse(Collections.emptyList(), pageable, false, pageToken));
+    public Mono<GetFeedsResponse<GetFeedsResponse.Content>> getFeed(Pageable pageable,
+                                                                    @RequestParam(required = false) String pageToken,
+                                                                    @RequestParam(required = false) String categoryId,
+                                                                    @RequestParam(required = false) String userId) {
+        return Mono.just(new GetFeedsResponse(Collections.emptyList(), pageable, false, pageToken));
     }
 
     @GetMapping("/daymotion/feeds/{id}")
-    public Mono<FeedResponse> getFeed(@PathVariable("id") String id) {
-        return Mono.just(FeedResponse.builder().build());
+    public Mono<GetFeedResponse> getFeedById(@PathVariable("id") String id) {
+        return Mono.just(GetFeedResponse.builder().build());
     }
 
     @PostMapping("/daymotion/feeds")
-    public Mono<PostFeedResponse> getFeed(@RequestBody PostFeedRequest request) {
+    public Mono<PostFeedResponse> postFeed(@RequestBody PostFeedRequest request) {
         //TODO: 미션 체크 후 카테고리 선택 (반정규화)
         return Mono.just(PostFeedResponse.builder().build());
     }
 
     @PutMapping("/daymotion/feeds/{id}")
-    public Mono<PutFeedResponse> putFeed(@PathVariable("id") String id, @RequestBody PutFeedRequest request) {
+    public Mono<PutFeedResponse> putFeedById(@PathVariable("id") String id, @RequestBody PutFeedRequest request) {
         //TODO: 본인 글 체크
         return Mono.just(PutFeedResponse.builder().build());
     }
 
     @DeleteMapping("/daymotion/feeds/{id}")
-    public Mono<Void> deleteFeed(@PathVariable("id") String id) {
+    public Mono<Void> deleteFeedById(@PathVariable("id") String id) {
         //TODO: 본인 글 체크
         return Mono.empty();
     }

@@ -1,7 +1,7 @@
 package com.f4sitive.api.service;
 
 import com.f4sitive.api.entity.Feed;
-import com.f4sitive.api.feed.model.GetFeedResponse;
+import com.f4sitive.api.feed.model.GetFeedsResponse;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -99,6 +99,6 @@ public class FeedService {
                         }
                     });
         }
-        return new GetFeedResponse<>(content, pageable, hasNext, String.join("&", nextParam));
+        return new GetFeedsResponse<>(content, pageable, hasNext, String.join("&", nextParam));
     }
 }
