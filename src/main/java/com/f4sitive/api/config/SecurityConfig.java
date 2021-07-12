@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
-import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -20,23 +19,17 @@ import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.server.resource.web.server.BearerTokenServerAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.server.ServerBearerTokenAuthenticationConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
-import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter;
 import org.springframework.security.web.server.savedrequest.NoOpServerRequestCache;
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
-import reactor.core.publisher.Mono;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.net.InetAddress;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 @ConfigurationProperties("security")
 @Configuration(proxyBeanMethods = false)
@@ -67,16 +60,8 @@ public class SecurityConfig {
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
                         .anyExchange().authenticated())
                 .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
-                        .authenticationEntryPoint(((Supplier<ServerAuthenticationEntryPoint>) () -> {
-                            BearerTokenServerAuthenticationEntryPoint entryPoint = new BearerTokenServerAuthenticationEntryPoint();
-                            entryPoint.setRealmName(realm);
-                            return entryPoint;
-                        }).get())
-                        .bearerTokenConverter(((Supplier<ServerAuthenticationConverter>) () -> {
-                            ServerBearerTokenAuthenticationConverter bearerTokenConverter = new ServerBearerTokenAuthenticationConverter();
-                            bearerTokenConverter.setAllowUriQueryParameter(true);
-                            return bearerTokenConverter;
-                        }).get())
+                        .authenticationEntryPoint(authenticationEntryPoint())
+                        .bearerTokenConverter(bearerTokenConverter())
                         .jwt(Customizer.withDefaults()))
                 .securityMatcher(new NegatedServerWebExchangeMatcher(ServerWebExchangeMatchers.matchers(
                         exchange -> "http".equals(exchange.getRequest().getURI().getScheme()) ? ServerWebExchangeMatcher.MatchResult.match() : ServerWebExchangeMatcher.MatchResult.notMatch(),
@@ -84,6 +69,18 @@ public class SecurityConfig {
                         EndpointRequest.toAnyEndpoint()
                 )))
                 .build();
+    }
+
+    BearerTokenServerAuthenticationEntryPoint authenticationEntryPoint() {
+        BearerTokenServerAuthenticationEntryPoint authenticationEntryPoint = new BearerTokenServerAuthenticationEntryPoint();
+        authenticationEntryPoint.setRealmName(realm);
+        return authenticationEntryPoint;
+    }
+
+    ServerBearerTokenAuthenticationConverter bearerTokenConverter() {
+        ServerBearerTokenAuthenticationConverter bearerTokenConverter = new ServerBearerTokenAuthenticationConverter();
+        bearerTokenConverter.setAllowUriQueryParameter(true);
+        return bearerTokenConverter;
     }
 
     @Bean
@@ -98,12 +95,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public GrantedAuthorityDefaults grantedAuthorityDefaults() {
+    GrantedAuthorityDefaults grantedAuthorityDefaults() {
         return new GrantedAuthorityDefaults("");
     }
 
     @Bean
-    public RoleHierarchy roleHierarchy() {
+    RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
         roleHierarchy.setHierarchy("");
         return roleHierarchy;
