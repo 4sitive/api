@@ -8,6 +8,7 @@ import org.springframework.data.annotation.*;
 import org.springframework.data.domain.Auditable;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -24,8 +25,9 @@ public class Mission implements Auditable<String, String, Instant>, Serializable
     private String question;
     private String image;
     private String content;
-    @DBRef
+    @DocumentReference
     private Category category;
+
     @Transient
     private String categoryName;
     @Version

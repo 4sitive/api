@@ -14,8 +14,8 @@ spring:
       auto-index-creation: true
       database: daymotion
   r2dbc:
-    url: r2dbc:mysql://4sitive.mysql.database.azure.com:3306/daymotion?useSSL=true&requireSSL=false&useUnicode=true&tcpKeepAlive=true&tcpNoDelay=true&connectTimeout=PT2S&tlsVersion=TLSv1.2&serverZoneId=Asia/Seoul&characterEncoding=utf8
-    username: sitive4@4sitive
+    url: r2dbc:mysql://4sitive.mysql.database.azure.com:3306/daymotion?sslMode=disabled&connectTimeout=PT2S&tcpKeepAlive=true&tcpNoDelay=true&serverZoneId=Asia/Seoul&characterEncoding=utf8
+    username: db_admin
     pool:
       initial-size: 1
       max-size: 1

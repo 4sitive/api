@@ -6,13 +6,13 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class GetUserResponse {
+public class GetUserByIdResponse {
     private String id;
     private String image;
     private String introduce;
 
-    public static GetUserResponse of(User user) {
-        return GetUserResponse.builder()
+    public static GetUserByIdResponse of(User user) {
+        return GetUserByIdResponse.builder()
                 .id(user.getId())
                 .image(user.getImage())
                 .introduce(user.getIntroduce())
