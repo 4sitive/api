@@ -7,8 +7,8 @@ import com.f4sitive.api.repository.MissionRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class MissionService {
         this.categoryRepository = categoryRepository;
     }
 
-    public Mono<List<Mission>> findAll(Pageable pageable){
+    public Mono<List<Mission>> findAll(Pageable pageable) {
         return Mono.fromCallable(() -> {
             return missionRepository.findAll(pageable).getContent();
         });
@@ -31,12 +31,13 @@ public class MissionService {
     }
 
     @Transactional
-    public Mono<Mission> save(Mission mission){
+    public Mono<Mission> save(Mission mission) {
         return Mono.fromCallable(() -> {
             mission.setCategory(categoryRepository.findByName(mission.getCategoryName())
                     .orElseGet(() -> categoryRepository.save(Category.of(mission.getCategoryName()))));
             return missionRepository.save(mission);
-        });
+        })
+                .subscribeOn(Schedulers.boundedElastic());
 //        return missionRepository.save(mission);
 //        return categoryRepository.findById(mission.getCategory().getId())
 //                .switchIfEmpty(categoryRepository.save(mission.getCategory()))
@@ -48,7 +49,7 @@ public class MissionService {
     }
 
     @Transactional
-    public Mono<Void> deleteById(String id){
+    public Mono<Void> deleteById(String id) {
         return Mono.fromRunnable(() -> missionRepository.deleteById(id));
 //        return missionRepository.deleteById(id);
     }

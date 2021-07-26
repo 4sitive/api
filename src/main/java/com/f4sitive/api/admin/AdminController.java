@@ -28,9 +28,7 @@ public class AdminController {
         mission.setImage(request.getImage());
         mission.setQuestion(request.getQuestion());
         mission.setCategoryName(request.getCategoryName());
-        return missionService
-                .save(mission)
-                .subscribeOn(Schedulers.boundedElastic());
+        return missionService.save(mission);
     }
 
     @PutMapping("/admin/mission/{id}")

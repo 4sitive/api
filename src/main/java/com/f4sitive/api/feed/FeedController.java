@@ -9,7 +9,7 @@ import java.util.Collections;
 
 @RestController
 public class FeedController {
-    @GetMapping("/daymotion/feeds")
+    @GetMapping("/feeds")
     public Mono<GetFeedsResponse<GetFeedsResponse.Content>> getFeed(Pageable pageable,
                                                                     @RequestParam(required = false) String pageToken,
                                                                     @RequestParam(required = false) String categoryId,
@@ -17,12 +17,12 @@ public class FeedController {
         return Mono.just(new GetFeedsResponse(Collections.emptyList(), pageable, false, pageToken));
     }
 
-    @GetMapping("/daymotion/feeds/{id}")
+    @GetMapping("/feeds/{id}")
     public Mono<GetFeedResponse> getFeedById(@PathVariable("id") String id) {
         return Mono.just(GetFeedResponse.builder().build());
     }
 
-    @PostMapping("/daymotion/feeds")
+    @PostMapping("/feeds")
     public Mono<PostFeedResponse> postFeed(@RequestBody PostFeedRequest request) {
         //TODO: 미션 체크 후 카테고리 선택 (반정규화)
         return Mono.just(PostFeedResponse.builder().build());

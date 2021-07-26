@@ -18,7 +18,7 @@ public class MissionController {
     }
 
     @Operation(description = "미션 조회")
-    @GetMapping("/daymotion/missions")
+    @GetMapping("/missions")
     public Mono<GetMissionResponse> getMission(@PageableDefault Pageable pageable){
 //        return missionService.findAll(pageable)
 //                .subscribeOn(Schedulers.boundedElastic());
