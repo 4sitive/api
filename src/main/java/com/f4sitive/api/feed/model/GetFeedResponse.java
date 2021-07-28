@@ -1,5 +1,6 @@
 package com.f4sitive.api.feed.model;
 
+import com.f4sitive.api.entity.Feed;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,4 +16,12 @@ public class GetFeedResponse {
     private UserResponse user;
     private Map<String, Long> emoji;
     private boolean author;
+
+    public static GetFeedResponse of(Feed feed){
+        return GetFeedResponse.builder()
+                .id(feed.getId())
+                .categoryName(feed.getMission().getCategory().getName())
+                .missionQuestion(feed.getMission().getQuestion())
+                .build();
+    }
 }

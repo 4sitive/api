@@ -13,18 +13,16 @@ import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
 import org.springframework.data.r2dbc.config.EnableR2dbcAuditing;
+import org.springframework.data.r2dbc.dialect.H2Dialect;
 import org.springframework.data.r2dbc.dialect.MySqlDialect;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
 import org.springframework.data.r2dbc.mapping.R2dbcMappingContext;
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
-import org.springframework.r2dbc.core.binding.BindMarkersFactory;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.reactive.ServerWebExchangeContextFilter;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
 import java.security.Principal;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 @EnableR2dbcAuditing
@@ -57,9 +55,9 @@ public class DataConfig {
     }
 
     @Bean
-    public ReactiveAuditorAware<String> reactiveAuditorAware() {
+    ReactiveAuditorAware<String> reactiveAuditorAware() {
         return () -> Mono.deferContextual(context -> ServerWebExchangeContextFilter.get(Context.of(context))
-                .map(exchange -> exchange.getPrincipal().map(Principal::getName).filter(StringUtils::hasText))
+                .map(exchange -> exchange.getPrincipal().map(Principal::getName))
                 .orElseGet(Mono::empty));
     }
 
@@ -80,45 +78,55 @@ public class DataConfig {
     @Configuration(proxyBeanMethods = false)
     protected static class R2dbcConfig extends AbstractR2dbcConfiguration {
         @Override
+        public ConnectionFactory connectionFactory() {
+            throw new IllegalStateException();
+        }
+
+        @Override
         public R2dbcDialect getDialect(ConnectionFactory connectionFactory) {
-            R2dbcDialect dialect = super.getDialect(connectionFactory);
-            if (dialect instanceof MySqlDialect) {
+            return dialect(super.getDialect(connectionFactory));
+        }
+
+        R2dbcDialect dialect(R2dbcDialect dialect) {
+            if (dialect instanceof org.springframework.data.r2dbc.dialect.MySqlDialect) {
                 return MySqlIdDialect.INSTANCE;
+            }
+            if (dialect instanceof org.springframework.data.r2dbc.dialect.H2Dialect) {
+                return H2IdDialect.INSTANCE;
             }
             return dialect;
         }
 
-        @Override
-        public ConnectionFactory connectionFactory() {
-            throw new IllegalStateException();
-        }
-    }
-
-    protected static class MySqlIdDialect extends org.springframework.data.relational.core.dialect.MySqlDialect implements R2dbcDialect {
-        MySqlIdDialect() {
-            super(IdentifierProcessing.create(new IdentifierProcessing.Quoting("`") {
+        static class H2IdDialect extends H2Dialect {
+            IdentifierProcessing identifierProcessing = IdentifierProcessing.create(new IdentifierProcessing.Quoting("\"") {
                 @Override
                 public String apply(String identifier) {
                     return "id".equals(identifier) ? identifier : super.apply(identifier);
                 }
-            }, IdentifierProcessing.LetterCasing.LOWER_CASE));
+            }, IdentifierProcessing.LetterCasing.LOWER_CASE);
+
+            static final H2IdDialect INSTANCE = new H2IdDialect();
+
+            @Override
+            public IdentifierProcessing getIdentifierProcessing() {
+                return identifierProcessing;
+            }
         }
 
-        public static final MySqlIdDialect INSTANCE = new MySqlIdDialect();
+        static class MySqlIdDialect extends MySqlDialect {
+            IdentifierProcessing identifierProcessing = IdentifierProcessing.create(new IdentifierProcessing.Quoting("`") {
+                @Override
+                public String apply(String identifier) {
+                    return "id".equals(identifier) ? identifier : super.apply(identifier);
+                }
+            }, IdentifierProcessing.LetterCasing.LOWER_CASE);
 
-        @Override
-        public BindMarkersFactory getBindMarkersFactory() {
-            return MySqlDialect.INSTANCE.getBindMarkersFactory();
-        }
+            static final MySqlIdDialect INSTANCE = new MySqlIdDialect();
 
-        @Override
-        public Collection<? extends Class<?>> getSimpleTypes() {
-            return MySqlDialect.INSTANCE.getSimpleTypes();
-        }
-
-        @Override
-        public Collection<Object> getConverters() {
-            return MySqlDialect.INSTANCE.getConverters();
+            @Override
+            public IdentifierProcessing getIdentifierProcessing() {
+                return identifierProcessing;
+            }
         }
     }
 }

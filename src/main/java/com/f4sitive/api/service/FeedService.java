@@ -1,7 +1,11 @@
 package com.f4sitive.api.service;
 
+import com.f4sitive.api.entity.Category;
 import com.f4sitive.api.entity.Feed;
 import com.f4sitive.api.feed.model.GetFeedsResponse;
+import com.f4sitive.api.repository.FeedRepository;
+import com.f4sitive.api.repository.MissionRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -12,6 +16,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.mongodb.repository.support.MappingMongoEntityInformation;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -21,15 +28,36 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+@Slf4j
+@Service
 public class FeedService {
     private final MongoOperations mongoOperations;
     private final MongoPersistentEntity entity;
     private final MongoEntityInformation<Feed, String> entityInformation;
+    private final FeedRepository feedRepository;
+    private final MissionRepository missionRepository;
 
-    public FeedService(MongoOperations mongoOperations) {
+    public FeedService(MongoOperations mongoOperations, FeedRepository feedRepository, MissionRepository missionRepository) {
         this.mongoOperations = mongoOperations;
         this.entity = mongoOperations.getConverter().getMappingContext().getRequiredPersistentEntity(Feed.class);
         this.entityInformation = new MappingMongoEntityInformation<>(this.entity, String.class);
+        this.feedRepository = feedRepository;
+        this.missionRepository = missionRepository;
+    }
+
+    public Optional<Feed> findById(String id){
+//        log.info("{}", feedRepository.findAllByCategoryId(id, Pageable.unpaged()).getContent());
+        return feedRepository.findById(id);
+    }
+
+    @Transactional
+    public Mono<Feed> save(Feed feed){
+        return Mono.justOrEmpty(missionRepository.findById(feed.getMissionId())
+                .map(mission -> {
+                    feed.setMission(mission);
+                    feed.setCategory(mission.getCategory());
+                    return feedRepository.save(feed);
+                }));
     }
 
     public Slice<Feed> test(Pageable pageable, Map<String, Object> param) {

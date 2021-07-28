@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Optional;
 
-@Document(collection = "mission")
+@Document
 @Getter
 @Setter
 @AllArgsConstructor
@@ -25,7 +25,8 @@ public class Mission implements Auditable<String, String, Instant>, Serializable
     private String question;
     private String image;
     private String content;
-    @DocumentReference
+    @DBRef
+//    @DocumentReference
     private Category category;
 
     @Transient
