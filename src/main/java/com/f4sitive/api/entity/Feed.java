@@ -24,7 +24,10 @@ public class Feed {
     private Mission mission;
     @DBRef
     private Category category;
+    @DocumentReference
+    private User user;
     private Map<String, Set<String>> emoji = new HashMap<>();
+    @Transient
     private String userId;
     @Transient
     private String missionId;

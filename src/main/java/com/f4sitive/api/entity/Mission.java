@@ -25,6 +25,7 @@ public class Mission implements Auditable<String, String, Instant>, Serializable
     private String question;
     private String image;
     private String content;
+    private String date;
     @DBRef
 //    @DocumentReference
     private Category category;

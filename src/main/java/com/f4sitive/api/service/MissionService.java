@@ -4,7 +4,13 @@ import com.f4sitive.api.entity.Category;
 import com.f4sitive.api.entity.Mission;
 import com.f4sitive.api.repository.CategoryRepository;
 import com.f4sitive.api.repository.MissionRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.schema.MongoJsonSchema;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -16,17 +22,23 @@ import java.util.List;
 public class MissionService {
     private final MissionRepository missionRepository;
     private final CategoryRepository categoryRepository;
+    private final MongoOperations mongoOperations;
 
     public MissionService(MissionRepository missionRepository,
-                          CategoryRepository categoryRepository) {
+                          CategoryRepository categoryRepository,
+                          MongoOperations mongoOperations) {
         this.missionRepository = missionRepository;
         this.categoryRepository = categoryRepository;
+        this.mongoOperations = mongoOperations;
     }
 
-    public Mono<List<Mission>> findAll(Pageable pageable) {
+    public Mono<Page<Mission>> findAll(Pageable pageable) {
         return Mono.fromCallable(() -> {
-            return missionRepository.findAll(pageable).getContent();
-        });
+//            List<Mission> content = mongoOperations.find(Query.query(Criteria.matchingDocumentStructure(MongoJsonSchema.of()).where("category.$id").ne(null)), Mission.class);
+//            return PageableExecutionUtils.getPage(content, pageable, content::size);
+            return missionRepository.findAllByDateIsNotNullAndCategoryIsNotNull(pageable);
+        })
+                .subscribeOn(Schedulers.boundedElastic());
 //        return Flux.fromIterable(missionRepository.findAll(pageable));
     }
 

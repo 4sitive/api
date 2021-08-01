@@ -1,6 +1,6 @@
 package com.f4sitive.api.category;
 
-import com.f4sitive.api.category.model.GetCategoriesResponse;
+import com.f4sitive.api.category.model.GetCategoryResponse;
 import com.f4sitive.api.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +17,8 @@ public class CategoryController {
 
     @Operation(description = "카테고리 조회")
     @GetMapping("/categories")
-    public Mono<GetCategoriesResponse> getCategory() {
+    public Mono<GetCategoryResponse> getCategory() {
         return categoryService.findAll()
-                .flatMap(dd -> Mono.just(GetCategoriesResponse.builder().build()));
+                .map(GetCategoryResponse::of);
     }
 }

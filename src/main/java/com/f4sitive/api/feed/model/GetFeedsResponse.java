@@ -1,5 +1,6 @@
 package com.f4sitive.api.feed.model;
 
+import com.f4sitive.api.entity.Feed;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Pageable;
@@ -28,5 +29,11 @@ public class GetFeedsResponse<T> extends SliceImpl<T> {
     public static class Content {
         private String id;
         private String image;
+        public static Content of(Feed feed){
+            return Content.builder()
+                    .id(feed.getId())
+                    .image(feed.getSubject())
+                    .build();
+        }
     }
 }

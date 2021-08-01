@@ -15,7 +15,7 @@ public class GetUserByIdResponse {
         return GetUserByIdResponse.builder()
                 .id(user.getId())
                 .image(user.getImage())
-                .introduce(user.getIntroduce())
+                .introduce(user.getUsername())
                 .build();
     }
 }
