@@ -2,16 +2,15 @@ package com.f4sitive.api.feed;
 
 import com.f4sitive.api.entity.Feed;
 import com.f4sitive.api.feed.model.GetFeedResponse;
-import com.f4sitive.api.feed.model.GetFeedsResponse;
 import com.f4sitive.api.feed.model.PostFeedRequest;
 import com.f4sitive.api.feed.model.PostFeedResponse;
-import com.f4sitive.api.feed.model.PutFeedRequest;
-import com.f4sitive.api.feed.model.PutFeedResponse;
+import com.f4sitive.api.feed.model.PutFeedByIdEmojiRequest;
+import com.f4sitive.api.feed.model.PutFeedByIdEmojiResponse;
 import com.f4sitive.api.model.Slice;
 import com.f4sitive.api.service.FeedService;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +19,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.security.Principal;
@@ -41,7 +42,7 @@ public class FeedController {
                                                 @RequestParam(required = false) String userId) {
         return feedService.findAll(pageable,
                 token,
-                Optional.ofNullable(categoryId).map(id -> Criteria.where("category.$id").is(new ObjectId(id))),
+                Optional.ofNullable(categoryId).map(id -> Criteria.where("category.$id").is(id)),
                 Optional.ofNullable(userId).map(id -> Criteria.where("user").is(id))
         )
                 .map(slice -> slice.map(feed -> {
@@ -61,24 +62,34 @@ public class FeedController {
     public Mono<PostFeedResponse> postFeed(Mono<Principal> principal, @RequestBody PostFeedRequest request) {
         return principal
                 .map(Principal::getName)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN)))
                 .flatMap(name -> {
                     Feed feed = new Feed();
-                    feed.setMissionId(request.getMissionId());
-                    return feedService.save(name, feed);
+                    feed.setImage(request.getImage());
+                    feed.setRequestId(request.getRequestId());
+                    return feedService.save(name, request.getMissionId(), feed);
                 })
                 .map(PostFeedResponse::of);
     }
 
-    @PutMapping("/daymotion/feeds/{id}")
-    public Mono<PutFeedResponse> putFeedById(@PathVariable("id") String id, @RequestBody PutFeedRequest request) {
-        //TODO: 본인 글 체크
-        return Mono.just(PutFeedResponse.builder().build());
+    @PutMapping("/feeds/{id}/emoji")
+    public Mono<PutFeedByIdEmojiResponse> putFeedById(Mono<Principal> principal, @PathVariable("id") String id, @RequestBody PutFeedByIdEmojiRequest request) {
+        return principal
+                .map(Principal::getName)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN)))
+                .flatMap(name -> feedService.saveById(id, feed -> {
+                    feed.getEmoji().put(name, request.getEmoji());
+                    return feed;
+                }))
+                .map(PutFeedByIdEmojiResponse::of);
     }
 
-    @DeleteMapping("/daymotion/feeds/{id}")
-    public Mono<Void> deleteFeedById(@PathVariable("id") String id) {
-        //TODO: 본인 글 체크
-        return Mono.empty();
+    @DeleteMapping("/feeds/{id}")
+    public Mono<ServerResponse> deleteFeedById(Mono<Principal> principal, @PathVariable("id") String id) {
+        return principal
+                .map(Principal::getName)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN)))
+                .flatMap(name -> ServerResponse.noContent().build(feedService.deleteById(name, id)));
     }
 
 }

@@ -7,16 +7,10 @@ import com.f4sitive.api.repository.MissionRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.schema.MongoJsonSchema;
-import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-
-import java.util.List;
 
 @Service
 public class MissionService {
@@ -33,13 +27,8 @@ public class MissionService {
     }
 
     public Mono<Page<Mission>> findAll(Pageable pageable) {
-        return Mono.fromCallable(() -> {
-//            List<Mission> content = mongoOperations.find(Query.query(Criteria.matchingDocumentStructure(MongoJsonSchema.of()).where("category.$id").ne(null)), Mission.class);
-//            return PageableExecutionUtils.getPage(content, pageable, content::size);
-            return missionRepository.findAllByDateIsNotNullAndCategoryIsNotNull(pageable);
-        })
+        return Mono.fromCallable(() -> missionRepository.findAllByDateIsNotNullAndCategoryIsNotNull(pageable))
                 .subscribeOn(Schedulers.boundedElastic());
-//        return Flux.fromIterable(missionRepository.findAll(pageable));
     }
 
     @Transactional

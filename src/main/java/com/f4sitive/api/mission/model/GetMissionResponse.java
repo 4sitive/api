@@ -10,9 +10,9 @@ import java.util.Map;
 @Getter
 @Builder
 public class GetMissionResponse  {
-    private LocalDate date;
-    private Map<String, List<MissionResponse>> content;
-    public static GetMissionResponse of(Map<String, List<MissionResponse>> content){
-        return GetMissionResponse.builder().content(content).date(LocalDate.now()).build();
+    private LocalDate now;
+    private List<MissionResponse> content;
+    public static GetMissionResponse of(List<MissionResponse> content){
+        return GetMissionResponse.builder().content(content).now(LocalDate.now()).build();
     }
 }

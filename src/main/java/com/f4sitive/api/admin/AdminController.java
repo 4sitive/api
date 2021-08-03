@@ -35,7 +35,7 @@ public class AdminController {
             mission.setImage(request.getImage());
             mission.setQuestion(request.getQuestion());
             mission.setCategoryName(request.getCategoryName());
-            mission.setDate(request.getDate().toString());
+            mission.setDate(request.getDate());
             return missionService.save(mission).map(PostMissionResponse::of);
         } else {
             return Mono.empty();

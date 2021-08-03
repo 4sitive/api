@@ -27,19 +27,12 @@ public class MissionController {
     @Operation(description = "미션 조회")
     @GetMapping("/missions")
     public Mono<GetMissionResponse> getMission(@PageableDefault Pageable pageable) {
-//        return missionService.findAll(pageable)
-//                .subscribeOn(Schedulers.boundedElastic());
         return missionService.findAll(pageable)
-                .map(Page::getContent)
-                .<Map<String, List<MissionResponse>>>map(content -> content.stream()
-                        .collect(LinkedMultiValueMap::new,
-                                (map, entry) -> map.add(entry.getDate(), MissionResponse.of(entry)),
-                                Map::putAll))
-                .map(GetMissionResponse::of);
+                .map(page -> GetMissionResponse.of(page.map(MissionResponse::of).getContent()));
     }
 
     @Operation(description = "투데이 미션 조회")
-    @GetMapping("/daymotion/today/missions")
+    @GetMapping("/today/missions")
     public Mono<GetTodayMissionResponse> getTodayMission() {
         return Mono.just(GetTodayMissionResponse.builder().build());
     }

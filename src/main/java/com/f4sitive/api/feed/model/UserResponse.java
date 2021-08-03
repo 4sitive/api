@@ -10,12 +10,14 @@ public class UserResponse {
     private String id;
     private String image;
     private String name;
+    private String username;
 
     public static UserResponse of(User user){
         return UserResponse.builder()
                 .id(user.getId())
                 .image(user.getImage())
-                .name(user.getUsername())
+                .name(user.getName())
+                .username(user.getUsername())
                 .build();
     }
 }

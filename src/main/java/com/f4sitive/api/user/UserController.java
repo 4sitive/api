@@ -5,14 +5,17 @@ import com.f4sitive.api.user.model.GetUserByIdResponse;
 import com.f4sitive.api.user.model.GetUserResponse;
 import com.f4sitive.api.user.model.PutUserRequest;
 import com.f4sitive.api.user.model.PutUserResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.security.Principal;
+import java.util.Optional;
 
 @RestController
 public class UserController {
@@ -26,6 +29,7 @@ public class UserController {
     public Mono<GetUserResponse> getUser(Mono<Principal> principal) {
         return principal
                 .map(Principal::getName)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN)))
                 .flatMap(userService::findById)
                 .map(GetUserResponse::of);
     }
@@ -40,10 +44,12 @@ public class UserController {
     public Mono<PutUserResponse> putUser(Mono<Principal> principal, @RequestBody PutUserRequest request) {
         return principal
                 .map(Principal::getName)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN)))
                 .flatMap(name -> userService.saveById(name,
                         user -> {
-                            user.setImage(request.getImage());
-                            user.setIntroduce(request.getIntroduce());
+                            Optional.ofNullable(request.getImage()).ifPresent(user::setImage);
+                            Optional.ofNullable(request.getIntroduce()).ifPresent(user::setIntroduce);
+                            Optional.ofNullable(request.getName()).ifPresent(user::setName);
                             return user;
                         }))
                 .map(PutUserResponse::of);

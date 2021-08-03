@@ -2,7 +2,6 @@ package com.f4sitive.api.service;
 
 import com.f4sitive.api.entity.Feed;
 import com.f4sitive.api.entity.User;
-import com.f4sitive.api.feed.model.GetFeedsResponse;
 import com.f4sitive.api.model.Slice;
 import com.f4sitive.api.repository.CategoryRepository;
 import com.f4sitive.api.repository.FeedRepository;
@@ -17,10 +16,11 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.mongodb.repository.support.MappingMongoEntityInformation;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Base64Utils;
-import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -61,10 +62,30 @@ public class FeedService {
     }
 
     @Transactional
-    public Mono<Feed> save(String userId, Feed entity) {
-        return Mono.defer(() -> Mono.justOrEmpty(missionRepository.findById(entity.getMissionId())
+    public Mono<Void> deleteById(String userId, String id){
+        return Mono.defer(() -> Mono.justOrEmpty(feedRepository.findById(id))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NO_CONTENT)))
+                .filter(feed -> feed.getUser().getId().equals(userId))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN)))
+                .flatMap(feed -> {
+                    feedRepository.delete(feed);
+                    return Mono.<Void>empty();
+                }))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Transactional
+    public Mono<Feed> saveById(String id, Function<Feed, Feed> function){
+        return Mono.defer(() -> Mono.justOrEmpty(feedRepository.findById(id).map(function).map(feedRepository::save)))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NO_CONTENT)))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Transactional
+    public Mono<Feed> save(String userId, String missionId, Feed entity) {
+        return Mono.defer(() -> Mono.justOrEmpty(missionRepository.findById(missionId)
                 .map(mission -> {
-                    entity.setUser(new User(userId));
+                    entity.setUser(User.id(userId));
                     entity.setMission(mission);
                     entity.setCategory(mission.getCategory());
                     return feedRepository.save(entity);
@@ -75,6 +96,7 @@ public class FeedService {
                     return feed;
                 })
         ))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST)))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
@@ -85,7 +107,7 @@ public class FeedService {
 
     private Slice<Feed> query(Pageable pageable, String token, Optional<Criteria>... optionals) {
         Map<String, String> param = decode(token);
-        Sort sort = pageable.getSortOr(Sort.by(Sort.Direction.ASC, "_id"));
+        Sort sort = pageable.getSortOr(Sort.by(Sort.Direction.DESC, "_id"));
         Query query = new Query().with(sort);
         Arrays.stream(optionals).filter(Optional::isPresent).map(Optional::get).forEach(query::addCriteria);
         Optional.ofNullable(sort.getOrderFor("_id"))

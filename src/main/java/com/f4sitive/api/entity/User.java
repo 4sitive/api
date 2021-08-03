@@ -18,8 +18,11 @@ public class User {
     private String introduce;
     @Indexed(unique = true)
     private String username;
+    private String name;
 
-    public User(String id) {
-        this.id = id;
+    public static User id(String id) {
+        User user = new User();
+        user.setId(id);
+        return user;
     }
 }

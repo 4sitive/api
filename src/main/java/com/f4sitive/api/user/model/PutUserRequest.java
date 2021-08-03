@@ -8,4 +8,5 @@ import lombok.Setter;
 public class PutUserRequest {
     private String image;
     private String introduce;
+    private String name;
 }

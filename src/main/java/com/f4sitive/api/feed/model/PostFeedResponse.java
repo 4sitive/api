@@ -16,7 +16,7 @@ public class PostFeedResponse {
         return PostFeedResponse.builder()
                 .id(feed.getId())
                 .missionQuestion(feed.getMission().getQuestion())
-                .categoryName(feed.getMission().getCategory().getName())
+                .categoryName(feed.getCategory().getName())
                 .build();
     }
 }

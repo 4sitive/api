@@ -9,11 +9,13 @@ import lombok.Getter;
 public class PutUserResponse {
     private String image;
     private String introduce;
+    private String name;
 
     public static PutUserResponse of(User user) {
         return PutUserResponse.builder()
                 .image(user.getImage())
                 .introduce(user.getIntroduce())
+                .name(user.getName())
                 .build();
     }
 }

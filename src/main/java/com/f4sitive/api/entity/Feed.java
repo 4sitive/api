@@ -3,12 +3,13 @@ package com.f4sitive.api.entity;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 
 @Document(collection = "feed")
@@ -17,18 +18,13 @@ import java.util.*;
 public class Feed {
     @Id
     private String id;
-    private String subject;
-    private String body;
+    private String image;
     @DBRef
-//    @DocumentReference(collection = "mission")
     private Mission mission;
     @DBRef
     private Category category;
     @DocumentReference
     private User user;
-    private Map<String, Set<String>> emoji = new HashMap<>();
-    @Transient
-    private String userId;
-    @Transient
-    private String missionId;
+    private String requestId;
+    private Map<String, Set<String>> emoji = new LinkedHashMap<>();
 }

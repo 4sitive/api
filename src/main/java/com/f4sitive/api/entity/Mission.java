@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Document
@@ -25,7 +26,7 @@ public class Mission implements Auditable<String, String, Instant>, Serializable
     private String question;
     private String image;
     private String content;
-    private String date;
+    private LocalDate date;
     @DBRef
 //    @DocumentReference
     private Category category;

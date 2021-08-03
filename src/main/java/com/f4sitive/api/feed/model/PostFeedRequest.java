@@ -10,7 +10,6 @@ import java.util.Map;
 @Setter
 public class PostFeedRequest {
     private String missionId;
-    private String content;
     private String image;
-    private Map<String, String> data = new HashMap<>();
+    private String requestId;
 }
