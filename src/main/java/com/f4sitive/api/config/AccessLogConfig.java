@@ -13,11 +13,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
-import org.springframework.http.server.reactive.HttpHandlerDecoratorFactory;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
-import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
+import org.springframework.http.server.reactive.*;
 import org.springframework.lang.NonNull;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StreamUtils;
@@ -36,13 +32,7 @@ import reactor.netty.http.server.HttpServerResponse;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
@@ -287,12 +277,16 @@ class AccessLogConfig {
 
             @Override
             public String getRequestContent() {
-                return new String(exchange.getAttributeOrDefault(AccessConstants.LB_INPUT_BUFFER, new byte[0]));
+                return Optional.ofNullable(exchange.<byte[]>getAttribute(AccessConstants.LB_INPUT_BUFFER))
+                        .map(String::new)
+                        .orElse("");
             }
 
             @Override
             public String getResponseContent() {
-                return new String(exchange.getAttributeOrDefault(AccessConstants.LB_OUTPUT_BUFFER, new byte[0]));
+                return Optional.ofNullable(exchange.<byte[]>getAttribute(AccessConstants.LB_OUTPUT_BUFFER))
+                        .map(String::new)
+                        .orElse("");
             }
 
             @Override
