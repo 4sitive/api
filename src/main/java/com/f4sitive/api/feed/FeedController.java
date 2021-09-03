@@ -9,7 +9,9 @@ import com.f4sitive.api.feed.model.PutFeedByIdEmojiResponse;
 import com.f4sitive.api.model.Slice;
 import com.f4sitive.api.service.FeedService;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,13 +38,15 @@ public class FeedController {
 
     @GetMapping("/feeds")
     public Mono<Slice<GetFeedResponse>> getFeed(Principal principal,
-                                                Pageable pageable,
+                                                @PageableDefault(direction = Sort.Direction.DESC) Pageable pageable,
                                                 @RequestParam(required = false) String token,
                                                 @RequestParam(required = false) String categoryId,
+                                                @RequestParam(required = false) String missionId,
                                                 @RequestParam(required = false) String userId) {
         return feedService.findAll(pageable,
                 token,
                 Optional.ofNullable(categoryId).map(id -> Criteria.where("category.$id").is(id)),
+                Optional.ofNullable(missionId).map(id -> Criteria.where("mission.$id").is(id)),
                 Optional.ofNullable(userId).map(id -> Criteria.where("user").is(id))
         )
                 .map(slice -> slice.map(feed -> {

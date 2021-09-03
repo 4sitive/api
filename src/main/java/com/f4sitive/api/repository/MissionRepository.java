@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Flux;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface MissionRepository extends MongoRepository<Mission, String> {
@@ -16,6 +17,10 @@ public interface MissionRepository extends MongoRepository<Mission, String> {
     List<Mission> sample(int size);
 
     Page<Mission> findAllByDateIsNotNullAndCategoryIsNotNull(Pageable pageable);
+
+    List<Mission> findAllByDateBetween(LocalDate start, LocalDate end);
+
+    List<Mission> findAllByDateGreaterThanEqualAndDateLessThan(LocalDate start, LocalDate end);
 
 //    default Flux<Mission> custom(){
 //        return findAll(Example.of(new Mission(null, "", null, null, null)));

@@ -12,6 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
 @Service
 public class MissionService {
     private final MissionRepository missionRepository;
@@ -28,6 +32,11 @@ public class MissionService {
 
     public Mono<Page<Mission>> findAll(Pageable pageable) {
         return Mono.fromCallable(() -> missionRepository.findAllByDateIsNotNullAndCategoryIsNotNull(pageable))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public Mono<List<Mission>> findAll(LocalDate date) {
+        return Mono.fromCallable(() -> missionRepository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plus(1L, ChronoUnit.DAYS)))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
