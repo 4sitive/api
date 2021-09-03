@@ -36,7 +36,7 @@ public class MissionService {
     }
 
     public Mono<List<Mission>> findAll(LocalDate date) {
-        return Mono.fromCallable(() -> missionRepository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plus(1L, ChronoUnit.DAYS)))
+        return Mono.fromCallable(() -> missionRepository.queryAllByDate(date, date.plus(1L, ChronoUnit.DAYS)))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 

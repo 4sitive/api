@@ -38,7 +38,7 @@ public class FeedController {
 
     @GetMapping("/feeds")
     public Mono<Slice<GetFeedResponse>> getFeed(Principal principal,
-                                                @PageableDefault(direction = Sort.Direction.DESC) Pageable pageable,
+                                                @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                 @RequestParam(required = false) String token,
                                                 @RequestParam(required = false) String categoryId,
                                                 @RequestParam(required = false) String missionId,

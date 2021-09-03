@@ -29,7 +29,7 @@ public class MissionController {
 
     @Operation(description = "미션 조회")
     @GetMapping("/missions")
-    public Mono<GetMissionResponse> getMission(@PageableDefault(direction = Sort.Direction.DESC) Pageable pageable) {
+    public Mono<GetMissionResponse> getMission(@PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return missionService.findAll(pageable)
                 .map(page -> GetMissionResponse.of(page.map(MissionResponse::of).getContent()));
     }

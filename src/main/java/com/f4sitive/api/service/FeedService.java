@@ -107,10 +107,10 @@ public class FeedService {
 
     private Slice<Feed> query(Pageable pageable, String token, Optional<Criteria>... optionals) {
         Map<String, String> param = decode(token);
-        Sort sort = pageable.getSortOr(Sort.by(Sort.Direction.DESC, "_id"));
+        Sort sort = pageable.getSortOr(Sort.by(Sort.Direction.DESC, "id"));
         Query query = new Query().with(sort);
         Arrays.stream(optionals).filter(Optional::isPresent).map(Optional::get).forEach(query::addCriteria);
-        Optional.ofNullable(sort.getOrderFor("_id"))
+        Optional.ofNullable(sort.getOrderFor("id"))
                 .flatMap(id -> Optional.ofNullable(param.get(id.getProperty()))
                         .map(value -> {
                             switch (id.getDirection()) {
@@ -125,7 +125,7 @@ public class FeedService {
                 .ifPresent(criteria -> {
                     AtomicReference<Criteria> reference = new AtomicReference<>(criteria);
                     List<Criteria> criteriaList = sort.stream()
-                            .filter(order -> !order.getProperty().equals("_id"))
+                            .filter(order -> !order.getProperty().equals("id"))
                             .map(order -> Optional.ofNullable(param.get(order.getProperty()))
                                     .map(value -> {
                                         switch (order.getDirection()) {
@@ -154,14 +154,14 @@ public class FeedService {
             content = entities.subList(0, pageable.getPageSize());
             Feed last = content.get(content.size() - 1);
             try {
-                nextParam.put("_id", (String) entity.getIdProperty().getRequiredGetter().invoke(last));
+                nextParam.put("id", (String) entity.getIdProperty().getRequiredGetter().invoke(last));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
             sort.stream()
-                    .filter(order -> !order.getProperty().equals("_id"))
+                    .filter(order -> !order.getProperty().equals("id"))
                     .forEach(order -> {
                         try {
                             nextParam.put(order.getProperty(), (String) entity.getRequiredPersistentProperty(order.getProperty()).getRequiredGetter().invoke(last));
