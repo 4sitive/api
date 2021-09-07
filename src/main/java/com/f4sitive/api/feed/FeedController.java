@@ -45,8 +45,8 @@ public class FeedController {
                                                 @RequestParam(required = false) String userId) {
         return feedService.findAll(pageable,
                 token,
-                Optional.ofNullable(categoryId).map(id -> Criteria.where("category.$id").is(id)),
-                Optional.ofNullable(missionId).map(id -> Criteria.where("mission.$id").is(id)),
+                Optional.ofNullable(categoryId).map(id -> Criteria.where("category.id").is(id)),
+                Optional.ofNullable(missionId).map(id -> Criteria.where("mission.id").is(id)),
                 Optional.ofNullable(userId).map(id -> Criteria.where("user").is(id))
         )
                 .map(slice -> slice.map(feed -> {

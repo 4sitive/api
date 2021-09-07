@@ -31,7 +31,7 @@ public class MissionService {
     }
 
     public Mono<Page<Mission>> findAll(Pageable pageable) {
-        return Mono.fromCallable(() -> missionRepository.findAllByDateIsNotNullAndCategoryIsNotNull(pageable))
+        return Mono.fromCallable(() -> missionRepository.queryAll(LocalDate.now(), pageable))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 

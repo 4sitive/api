@@ -17,7 +17,9 @@ public class GetFeedResponse {
     private String id;
     private String image;
     private String categoryName;
+    private String categoryId;
     private String missionQuestion;
+    private String missionId;
     private UserResponse user;
     private Map<String, Long> emoji;
     private boolean author;
@@ -34,9 +36,12 @@ public class GetFeedResponse {
         return GetFeedResponse.builder()
                 .id(feed.getId())
                 .categoryName(feed.getCategory().getName())
+                .categoryId(feed.getCategory().getId())
                 .missionQuestion(feed.getMission().getQuestion())
+                .missionId(feed.getMission().getId())
                 .user(UserResponse.of(user))
                 .emoji(emoji)
+                .image(feed.getImage())
                 .author(user.getId().equals(userId))
                 .build();
     }

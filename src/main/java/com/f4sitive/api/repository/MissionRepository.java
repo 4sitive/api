@@ -24,6 +24,9 @@ public interface MissionRepository extends MongoRepository<Mission, String> {
     @Query("{'date' : { $gte: ?0, $lt: ?1 } }")
     List<Mission> queryAllByDate(LocalDate start, LocalDate end);
 
+    @Query("{'date' : { $lt: ?0 }, 'category' : {$ne : null} }")
+    Page<Mission> queryAll(LocalDate end, Pageable pageable);
+
 //    default Flux<Mission> custom(){
 //        return findAll(Example.of(new Mission(null, "", null, null, null)));
 //    }
