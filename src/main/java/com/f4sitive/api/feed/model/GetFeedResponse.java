@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -22,6 +23,7 @@ public class GetFeedResponse {
     private String missionId;
     private UserResponse user;
     private Map<String, Long> emoji;
+    private Collection<String> myEmojis;
     private boolean author;
 
     public static GetFeedResponse of(Feed feed, String userId){
@@ -41,6 +43,7 @@ public class GetFeedResponse {
                 .missionId(feed.getMission().getId())
                 .user(UserResponse.of(user))
                 .emoji(emoji)
+                .myEmojis(Optional.ofNullable(feed.getEmoji().get(userId)).orElse(Collections.emptySet()))
                 .image(feed.getImage())
                 .author(user.getId().equals(userId))
                 .build();
