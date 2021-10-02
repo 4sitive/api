@@ -91,6 +91,8 @@ public class FeedService {
                     return feedRepository.save(entity);
                 })
                 .map(feed -> {
+                    feed.getMission().getFeeds().add(feed);
+                    missionRepository.save(feed.getMission());
                     feed.getCategory().getFeeds().add(feed);
                     categoryRepository.save(feed.getCategory());
                     return feed;

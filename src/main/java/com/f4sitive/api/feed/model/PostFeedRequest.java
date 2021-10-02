@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
@@ -12,4 +13,5 @@ public class PostFeedRequest {
     private String missionId;
     private String image;
     private String requestId;
+    private Map<String, String> attributes = new LinkedHashMap<>();
 }

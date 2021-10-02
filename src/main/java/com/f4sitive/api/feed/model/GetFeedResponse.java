@@ -25,6 +25,7 @@ public class GetFeedResponse {
     private Map<String, Long> emoji;
     private Collection<String> myEmojis;
     private boolean author;
+    private Map<String, String> attributes;
 
     public static GetFeedResponse of(Feed feed, String userId){
         Map<String, Long> emoji = feed.getEmoji()
@@ -46,6 +47,7 @@ public class GetFeedResponse {
                 .myEmojis(Optional.ofNullable(feed.getEmoji().get(userId)).orElse(Collections.emptySet()))
                 .image(feed.getImage())
                 .author(user.getId().equals(userId))
+                .attributes(feed.getAttributes())
                 .build();
     }
 }

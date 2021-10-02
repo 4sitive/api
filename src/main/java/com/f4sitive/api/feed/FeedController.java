@@ -71,6 +71,7 @@ public class FeedController {
                     Feed feed = new Feed();
                     feed.setImage(request.getImage());
                     feed.setRequestId(request.getRequestId());
+                    feed.setAttributes(request.getAttributes());
                     return feedService.save(name, request.getMissionId(), feed);
                 })
                 .map(PostFeedResponse::of);

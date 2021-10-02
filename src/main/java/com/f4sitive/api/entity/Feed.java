@@ -26,5 +26,6 @@ public class Feed {
     @DocumentReference
     private User user;
     private String requestId;
+    private Map<String, String> attributes = new LinkedHashMap<>();
     private Map<String, Set<String>> emoji = new LinkedHashMap<>();
 }

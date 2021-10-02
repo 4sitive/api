@@ -13,7 +13,9 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Document
 @Getter
@@ -30,6 +32,9 @@ public class Mission implements Auditable<String, String, Instant>, Serializable
     @DBRef
 //    @DocumentReference
     private Category category;
+
+    @DBRef(lazy = true)
+    private Set<Feed> feeds = new HashSet<>();
 
     @Transient
     private String categoryName;
