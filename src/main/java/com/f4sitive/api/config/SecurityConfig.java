@@ -89,7 +89,7 @@ public class SecurityConfig {
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
         jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
-                new JwtTimestampValidator(Duration.of(1, ChronoUnit.DAYS))
+                new JwtTimestampValidator(Duration.of(1, ChronoUnit.MINUTES))
         ));
         return jwtDecoder;
     }
